@@ -8,22 +8,25 @@ import (
 	"github.com/trosh/term"
 )
 
-func mean100to666(m image.Image, p image.Point) (or, og, ob int) {
+type img struct {
+	m image.Image
+}
+
+func (i img) meangray(p image.Point, pr image.Point) (gray int) {
 	var r, g, b uint32
-	for iy := p.Y; iy < p.Y+10; iy += 1 {
-		for ix := p.X; ix < p.X+10; ix += 1 {
-			cr, cg, cb, _ := m.At(ix, iy).RGBA()
+	for iy := p.Y; iy < p.Y+pr.Y; iy += 1 {
+		for ix := p.X; ix < p.X+pr.X; ix += 1 {
+			cr, cg, cb, _ := i.m.At(ix, iy).RGBA()
 			r += cr
 			g += cg
 			b += cb
 		}
 	}
-	size := uint32(100)
+	size := uint32(pr.X*pr.Y)
 	r /= size
 	g /= size
 	b /= size
-	or, og, ob = int(r/10922), int(g/10922), int(b/10922)
-	return or, og, ob
+	return int((r+g+b)/8548)+232
 }
 
 func main() {
@@ -40,12 +43,26 @@ func main() {
 	                term.Pxl{bounds.Dx()/10,
 	                         bounds.Dy()/10},
 	                0}
-	scr.Flush()
-	for y := bounds.Min.Y; y < bounds.Max.Y; y += 10 {
-		for x := bounds.Min.X; x < bounds.Max.X; x += 10 {
-			r, g, b := mean100to666(m, image.Point{x, y})
-			scr.Plot(term.Pxl{x/10, y/10}, 36*r + 6*g + b + 16)
+	//scr.Flush()
+	pr := image.Point{1, 2}
+	if len(os.Args) == 3 {
+		for i := 0; i < len(os.Args[2]); i++ {
+			pr.X*=2
+			pr.Y*=2
 		}
 	}
+	for y := bounds.Min.Y; y < bounds.Min.Y+30*pr.Y; y += pr.Y {
+		for x := bounds.Min.X; x < bounds.Min.X+110*pr.X; x += pr.X {
+			gray := img{m}.meangray(image.Point{x, y}, pr)
+			scr.Plot(term.Pxl{x/pr.X, y/pr.Y}, gray)
+		}
+	}
+	/*
+	for y := 0; y < 30; y += 1 {
+		for x := 0; x < 110; x += 1 {
+			r, g, b, _ := m.At(x, y).RGBA()
+			scr.Plot(term.Pxl{x+1, y+1}, int((r+g+b)/8548)+232)
+		}
+	}
+	*/
 }
-
