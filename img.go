@@ -25,16 +25,17 @@ func main() {
 	scr.Flush()
 	for y := bounds.Min.Y;
 	    y < bounds.Max.Y;
-	    y+=10 {
+	    y += 10 {
 		for x := bounds.Min.X;
 		    x < bounds.Max.X;
-		    x+=10 {
+		    x += 10 {
 			var r, g, b uint32
 			for ix := x;
 			    ix < x+10;
-			    ix++ {
+			    ix += 10 {
 				for iy := y;
-				    iy < y+10; iy++ {
+				    iy < y+10;
+				    iy += 1 {
 					cr, cg, cb, _ := m.At(ix,
 					                      iy).RGBA()
 					r += cr
@@ -42,7 +43,7 @@ func main() {
 					b += cb
 				}
 			}
-			size := uint32(81)
+			size := uint32(100)
 			r /= size
 			g /= size
 			b /= size
